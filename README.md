@@ -2,7 +2,7 @@
 
 ![NuGet Version](https://img.shields.io/nuget/v/SpectreConsoleHost)
 
-A Generic Host builder for Spectre.Console
+A Generic Host builder for [Spectre.Console](https://spectreconsole.net/)
 
 [Examples](https://github.com/snargledorf/SpectreConsoleHost.Examples)
 
