@@ -7,15 +7,12 @@
         <Title>SpectreConsoleHost</Title>
         <Authors>snargledorf</Authors>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageReadmeFile>README.nuget.md</PackageReadmeFile>
         <RepositoryUrl>https://github.com/snargledorf/SpectreConsoleHost.git</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <Description>A generic host builder for Spectre.Console</Description>
+        <Version>1.0.1</Version>
     </PropertyGroup>
-
-    <ItemGroup>
-        <None Include="..\README.md" Pack="true" PackagePath=""/>
-    </ItemGroup>
 
     <ItemGroup>
       <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.1" />
