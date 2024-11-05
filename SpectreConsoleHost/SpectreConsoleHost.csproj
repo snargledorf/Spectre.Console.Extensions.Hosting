@@ -4,9 +4,22 @@
         <TargetFrameworks>net6.0;net7.0;net8.0;netstandard2.0</TargetFrameworks>
         <RootNamespace>Spectre.Console.Builder</RootNamespace>
         <LangVersion>7.3</LangVersion>
-        <Title>A generic host builder for Spectre.Console</Title>
+        <Title>SpectreConsoleHost</Title>
         <Authors>snargledorf</Authors>
+        <PackageLicenseFile>LICENSE</PackageLicenseFile>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <RepositoryUrl>https://github.com/snargledorf/SpectreConsoleHost.git</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <Description>A generic host builder for Spectre.Console</Description>
     </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="..\LICENSE" Pack="true" PackagePath=""/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="..\README.md" Pack="true" PackagePath=""/>
+    </ItemGroup>
 
     <ItemGroup>
       <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.1" />
