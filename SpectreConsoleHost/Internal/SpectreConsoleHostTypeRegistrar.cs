@@ -9,17 +9,17 @@ namespace Spectre.Console.Builder.Internal
     internal class SpectreConsoleHostTypeRegistrar : ITypeRegistrar
     {
         private readonly Dictionary<Type, List<Func<object>>> _factories = new Dictionary<Type, List<Func<object>>>();
-        private readonly IServicesProvider _servicesProvider;
+        private readonly Func<IServiceProvider> _getServiceProvider;
 
-        public SpectreConsoleHostTypeRegistrar(IServicesProvider servicesProvider)
+        public SpectreConsoleHostTypeRegistrar(Func<IServiceProvider> getServiceProvider)
         {
-            _servicesProvider = servicesProvider;
+            _getServiceProvider = getServiceProvider;
         }
 
         public void Register(Type service, Type implementation)
         {
             GetFactoryList(service).Add(() =>
-                ActivatorUtilities.GetServiceOrCreateInstance(_servicesProvider.Services, implementation));
+                ActivatorUtilities.GetServiceOrCreateInstance(_getServiceProvider(), implementation));
         }
 
         public void RegisterInstance(Type service, object implementation)
@@ -36,7 +36,7 @@ namespace Spectre.Console.Builder.Internal
         {
             return new SpectreConsoleHostTypeResolver(
                 _factories.ToDictionary(kvp => kvp.Key, kvp => kvp.Value.AsReadOnly()).AsReadOnly(),
-                _servicesProvider);
+                _getServiceProvider);
         }
 
         private List<Func<object>> GetFactoryList(Type service)

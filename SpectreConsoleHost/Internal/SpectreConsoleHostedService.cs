@@ -14,32 +14,32 @@ namespace Spectre.Console.Builder.Internal
         private int _exitCode;
         private readonly IHostApplicationLifetime _applicationLifetime;
         private readonly IOptions<SpectreConsoleHostedServiceOptions> _options;
+        private readonly IEnumerable<ICommandApp> _commandApps;
         private readonly ILogger<SpectreConsoleHostedService> _logger;
 
         public SpectreConsoleHostedService(IHostApplicationLifetime applicationLifetime,
             IOptions<SpectreConsoleHostedServiceOptions> options,
+            IEnumerable<ICommandApp> commandApps,
             ILogger<SpectreConsoleHostedService> logger)
         {
             _applicationLifetime = applicationLifetime;
             _options = options;
+            _commandApps = commandApps;
             _logger = logger;
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            _ = RunCommandAppAsync();
+            foreach (ICommandApp commandApp in _commandApps)
+                _ = RunCommandAppAsync(commandApp);
 
             _logger.LogDebug("Spectre Console Hosted service is started.");
 
             return Task.CompletedTask;
         }
 
-        private async Task RunCommandAppAsync()
+        private async Task RunCommandAppAsync(ICommandApp commandApp)
         {
-            ICommandApp commandApp = _options.Value.CommandApp;
-            if (commandApp is null)
-                throw new InvalidOperationException("CommandApp must be specified.");
-
             IEnumerable<string> args = _options.Value.Args;
             if (args is null)
                 throw new InvalidOperationException("Args must be specified.");
@@ -47,7 +47,7 @@ namespace Spectre.Console.Builder.Internal
             try
             {
                 _logger.LogDebug("Running command app");
-                _exitCode = await commandApp.RunAsync(args);
+                _exitCode = await commandApp.RunAsync(args).ConfigureAwait(false);
             }
             catch (Exception ex) when (!(ex is OperationCanceledException))
             {

@@ -8,12 +8,12 @@ namespace Spectre.Console.Builder.Internal
     internal class SpectreConsoleHostTypeResolver : ITypeResolver
     {
         private readonly ReadOnlyDictionary<Type, ReadOnlyCollection<Func<object>>> _serviceFactories;
-        private readonly IServicesProvider _servicesProvider;
+        private readonly Func<IServiceProvider> _getServiceProvider;
 
-        public SpectreConsoleHostTypeResolver(ReadOnlyDictionary<Type, ReadOnlyCollection<Func<object>>> serviceFactories, IServicesProvider servicesProvider)
+        public SpectreConsoleHostTypeResolver(ReadOnlyDictionary<Type, ReadOnlyCollection<Func<object>>> serviceFactories, Func<IServiceProvider> getServiceProvider)
         {
             _serviceFactories = serviceFactories;
-            _servicesProvider = servicesProvider;
+            _getServiceProvider = getServiceProvider;
         }
 
         public object Resolve(Type type)
@@ -22,7 +22,7 @@ namespace Spectre.Console.Builder.Internal
                 return null;
 
             Func<object> typeFactory = _serviceFactories.GetValueOrDefault(type)?.LastOrDefault();
-            return typeFactory is null ? _servicesProvider.Services.GetService(type) : typeFactory();
+            return typeFactory is null ? _getServiceProvider().GetService(type) : typeFactory();
         }
     }
 }

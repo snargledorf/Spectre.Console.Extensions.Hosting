@@ -12,42 +12,35 @@ namespace Spectre.Console.Builder
 {
     internal class SpectreConsoleHostBuilder<TDefaultCommand> : SpectreConsoleHostBuilder where TDefaultCommand : class, ICommand
     {
-        public SpectreConsoleHostBuilder(params string[] args) : base(args)
+        public SpectreConsoleHostBuilder(params string[] args) : base(args, tr => new CommandApp<TDefaultCommand>(tr))
         {
         }
-
-        protected override ICommandApp CommandApp => new CommandApp<TDefaultCommand>(TypeRegistrar);
     }
 
-    public class SpectreConsoleHostBuilder : IHostApplicationBuilder, IServicesProvider
+    public class SpectreConsoleHostBuilder : IHostApplicationBuilder
     {
         private readonly HostApplicationBuilder _builder;
-        private CommandApp _commandApp;
 
         private IHost _builtHost;
     
-        private SpectreConsoleHostConfigurator _configurator;
-        private SpectreConsoleHostTypeRegistrar _typeRegistrar;
+        private readonly SpectreConsoleHostConfigurator _configurator;
 
-        internal SpectreConsoleHostBuilder(params string[] args)
+        internal SpectreConsoleHostBuilder(string[] args, Func<ITypeRegistrar, ICommandApp> buildCommandApp = null)
         {
             _builder = Host.CreateApplicationBuilder(args);
-
-            Services.AddHostedService<SpectreConsoleHostedService>();
-
-            Services.Configure<SpectreConsoleHostedServiceOptions>(options =>
-            {
-                if (_configurator is SpectreConsoleHostConfigurator configurator)
-                    CommandApp.Configure(configurator.Configure);
             
-                options.CommandApp = CommandApp;
-                options.Args = args;
+            var typeRegistrar = new SpectreConsoleHostTypeRegistrar(() =>
+            {
+                IHost builtHost = _builtHost ?? throw new InvalidOperationException("Host has not been built");
+                return builtHost.Services;
             });
-        }
+            
+            _configurator = new SpectreConsoleHostConfigurator(typeRegistrar);
+            
+            ICommandApp commandApp = buildCommandApp?.Invoke(typeRegistrar) ?? new CommandApp(typeRegistrar);
 
-        protected ITypeRegistrar TypeRegistrar => _typeRegistrar = _typeRegistrar ?? new SpectreConsoleHostTypeRegistrar(this);
-    
-        protected virtual ICommandApp CommandApp => _commandApp = _commandApp ?? new CommandApp(TypeRegistrar);
+            Services.AddSpectreConsoleInternal(args, commandApp, appConfigurator => _configurator.Configure(appConfigurator));
+        }
 
         void IHostApplicationBuilder.ConfigureContainer<TContainerBuilder>(
             IServiceProviderFactory<TContainerBuilder> factory, Action<TContainerBuilder> configure) =>
@@ -66,23 +59,11 @@ namespace Spectre.Console.Builder
 
         public IServiceCollection Services => _builder.Services;
 
-        public IConfigurator Configurator => _configurator = _configurator ?? new SpectreConsoleHostConfigurator(TypeRegistrar);
+        public IConfigurator Configurator => _configurator;
 
         public IHost Build()
         {
             return _builtHost = _builder.Build();
-        }
-
-        IServiceProvider IServicesProvider.Services
-        {
-            get
-            {
-                IHost builtHost = _builtHost;
-                if (builtHost is null)
-                    throw new InvalidOperationException("Host has not been built");
-            
-                return builtHost.Services;
-            }
         }
     }
 }
