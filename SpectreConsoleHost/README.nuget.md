@@ -10,9 +10,7 @@ Calling the `AddSpectreConsole` service collection extension methods will add a 
 
 The extension methods can be called multiple times to add multiple apps to be executed, although this is generally not recommended.
 
-The application will exit once all the added command apps complete execution.
-
-The exit code is set by the last command app to finish execution.
+The application will exit once all the added command apps complete execution with the exit code being set by the last command app to finish execution.
 
 ### Basic Usage
 
@@ -51,9 +49,7 @@ await builder.Build().RunAsync();
 
 ## Host Builder
 
-The host builder adds a command app with the configuration from the Configurator property.
-
-You can add additional apps using the service collection extensions methods.
+The host builder adds a command app with the configuration from the builders `Configurator` property.
 
 ### Basic usage
 
