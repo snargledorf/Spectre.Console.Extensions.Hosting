@@ -7,6 +7,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Spectre.Console.Builder.Internal;
 using Spectre.Console.Cli;
+using Spectre.Console.Extensions.Hosting;
+using Spectre.Console.Extensions.Hosting.Internal;
 
 namespace Spectre.Console.Builder
 {
@@ -39,7 +41,7 @@ namespace Spectre.Console.Builder
             
             ICommandApp commandApp = buildCommandApp?.Invoke(typeRegistrar) ?? new CommandApp(typeRegistrar);
 
-            Services.AddSpectreConsoleInternal(args, commandApp, appConfigurator => _configurator.Configure(appConfigurator));
+            Services.AddSpectreConsole(args, commandApp, appConfigurator => _configurator.Configure(appConfigurator));
         }
 
         void IHostApplicationBuilder.ConfigureContainer<TContainerBuilder>(

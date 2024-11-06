@@ -2,19 +2,65 @@
 
 ![NuGet Version](https://img.shields.io/nuget/v/SpectreConsoleHost)
 
-A Generic Host builder for [Spectre.Console](https://spectreconsole.net/)
+A Generic Host builder and extensions for [Spectre.Console](https://spectreconsole.net/)
 
 [Examples](https://github.com/snargledorf/SpectreConsoleHost.Examples)
 
-## Basic Usage
+## Extension Methods
 
-### No default command
+Calling the `AddSpectreConsole` service collection extension methods will add a Spectre.Console command app to be executed.
+
+The extension methods can be called multiple times to add multiple apps to be executed, although this is generally not recommended.
+
+The application will exit once all the added command apps complete execution.
+
+The exit code is set by the last command app to finish execution.
+
+### Basic Usage
+
+#### No default command
 ```c#
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Spectre.Console.Cli;
-using Spectre.Console.Builder;
+HostApplicationBuilder builder = Host.CreateApplicationBuilder(args);
 
+builder.Services.AddSpectreConsole(args, configurator =>
+{
+    configurator.AddCommand<ExampleCommand>("example");
+});
+
+await builder.Build().RunAsync();
+```
+
+#### Default command
+Without additional configuration
+```c#
+HostApplicationBuilder builder = Host.CreateApplicationBuilder(args);
+
+builder.Services.AddSpectreConsole<DefaultCommand>(args);
+
+await builder.Build().RunAsync();
+```
+With additional configuration
+```c#
+HostApplicationBuilder builder = Host.CreateApplicationBuilder(args);
+
+builder.Services.AddSpectreConsole<DefaultCommand>(args, configurator =>
+{
+    configurator.AddCommand<ExampleCommand>("example");
+});
+
+await builder.Build().RunAsync();
+```
+
+## Host Builder
+
+The host builder adds a command app with the configuration from the Configurator property.
+
+You can add additional apps using the service collection extensions methods.
+
+### Basic usage
+
+#### No default command
+```c#
 SpectreConsoleHostBuilder builder = SpectreConsoleHost.CreateBuilder(args);
 
 builder.Configurator.AddCommand<SomeCommand>("somecommand");
@@ -22,14 +68,11 @@ builder.Configurator.AddCommand<SomeCommand>("somecommand");
 await builder.Build().RunAsync();
 ```
 
-### Default command
+#### Default command
 ```c#
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Spectre.Console.Cli;
-using Spectre.Console.Builder;
-
 SpectreConsoleHostBuilder builder = SpectreConsoleHost.CreateBuilder<DefaultCommand>(args);
+
+builder.Configurator.AddCommand<SomeCommand>("somecommand");
 
 await builder.Build().RunAsync();
 ```

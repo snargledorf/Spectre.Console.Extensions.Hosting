@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
-namespace Spectre.Console.Builder.Internal
+namespace Spectre.Console.Extensions.Hosting.Internal
 {
-    public static class DictionaryExtensions
+    internal static class DictionaryExtensions
     {
         public static TValue GetValueOrDefault<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> dictionary, TKey key)
         {
