@@ -31,7 +31,7 @@ namespace Spectre.Console.Builder
 
         internal SpectreConsoleHostBuilder(params string[] args)
         {
-            _builder = Microsoft.Extensions.Hosting.Host.CreateApplicationBuilder(args);
+            _builder = Host.CreateApplicationBuilder(args);
 
             Services.AddHostedService<SpectreConsoleHostedService>();
 
